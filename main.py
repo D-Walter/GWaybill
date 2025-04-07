@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import login, admin_users, waybills
+from routers import admin_waybills, login, admin_users, admin_trackings
 from routers.login import initialize_root_password
 from dotenv import load_dotenv
 from logger import OperationLogMiddleware
@@ -19,4 +19,5 @@ app = FastAPI(title="物流系统", description="含JWT认证与签名校验", v
 app.add_middleware(OperationLogMiddleware)
 app.include_router(login.router)
 app.include_router(admin_users.router)
-app.include_router(waybills.router)
+app.include_router(admin_waybills.router)
+app.include_router(admin_trackings.router)

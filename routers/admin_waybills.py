@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+
+import pymysql
 from auth_dependencies import require_role
 from db import get_connection
 
@@ -59,9 +61,12 @@ def create_waybill(waybill: Waybill):
                 %(reserved1)s, %(reserved2)s, %(reserved3)s
             )
             """
-            cursor.execute(sql, waybill.dict())
+            cursor.execute(sql, waybill.model_dump())
         conn.commit()
         return {"message": "运单创建成功", "waybill_number": waybill.waybill_number}
+    except pymysql.err.IntegrityError as e:
+        if "Duplicate entry" in str(e):
+            raise HTTPException(status_code=400, detail="运单号已存在")
     finally:
         conn.close()
 
